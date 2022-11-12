@@ -31,5 +31,15 @@ class Bulk(BDF):
         self.junctions = {}
 
     def read_bulk(self, bulk_filename):
+        """
+        Read method for the bulk files
+
+        Parameters
+        ----------
+        bulk_filename: str
+            the input bulk file
+        """
         self.read_bdf(bulk_filename)
-        # set self_2d with function _get_part_2d
+        # set self.part_2d with method self._get_part_2d
+        # set self.fasteners with method self._get_fasteners
+        # set self.junctions with method self._get_junctions
