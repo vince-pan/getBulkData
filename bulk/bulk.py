@@ -65,3 +65,14 @@ class Bulk(BDF):
             self._selected_nids = _set_selected_nids(bulk)
             self._bulk_nids.remove(self._selected_nids)
             self._attached_eid, part_list = _get_attached_eid_from_nid(bulk)
+
+class PART():
+    """
+    PART object
+    """
+    def __init__(self):
+        """
+        Initialize the PART object
+        """
+        self.id = None
+        self.elements = {}
