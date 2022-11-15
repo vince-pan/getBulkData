@@ -49,19 +49,19 @@ class Bulk(BDF):
         Get 2D parts of a finite element model
         """
         # list of all node ids
-        self.bulk_nids = self.node_ids
+        self._bulk_nids = self.node_ids
 
         # blank part list
-        self.part_list = {}
+        self._part_list = {}
 
         # blank element ids list
-        self.attached_eids = {}
+        self._attached_eids = {}
 
         # blank node list from which search for elements
-        self.selected_nids = {}
+        self._selected_nids = {}
 
         # while bulk_nids is not empty, search for attached elements
-        while bulk_nids.len() =! 0:
-            self.selected_nids = self._set_selected_nids(bulk)
-            self.bulk_nids.remove(self.selected_nids)
-            self.attached_eid, part_list = self._get_attached_eid_from_nid()
+        while self._bulk_nids.len() =! 0:
+            self._selected_nids = self._set_selected_nids(bulk)
+            self._bulk_nids.remove(self._selected_nids)
+            self._attached_eid, part_list = self._get_attached_eid_from_nid()
