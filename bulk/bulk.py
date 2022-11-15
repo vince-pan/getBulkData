@@ -43,3 +43,8 @@ class Bulk(BDF):
         # set self.part_2d with method self._get_part_2d
         # set self.fasteners with method self._get_fasteners
         # set self.junctions with method self._get_junctions
+
+    def get_parts_2d(self):
+        """
+        Get 2D parts of a finite element model
+        """
