@@ -8,7 +8,7 @@ Main Bulk class.  Defines:
 """
 
 from pyNastran.bdf.bdf import BDF
-
+from bulk_utils import _set_selected_nids, _get_attached_eid_from_nid
 
 class Bulk(BDF):
     """
@@ -62,6 +62,6 @@ class Bulk(BDF):
 
         # while bulk_nids is not empty, search for attached elements
         while self._bulk_nids.len() =! 0:
-            self._selected_nids = self._set_selected_nids(bulk)
+            self._selected_nids = _set_selected_nids(bulk)
             self._bulk_nids.remove(self._selected_nids)
-            self._attached_eid, part_list = self._get_attached_eid_from_nid()
+            self._attached_eid, part_list = _get_attached_eid_from_nid(bulk)
