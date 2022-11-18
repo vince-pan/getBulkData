@@ -39,12 +39,14 @@ class Bulk(BDF):
         bulk_filename: str
             the input bulk file
         """
+        # read bdf file
         self.read_bdf(bulk_filename)
-        # set self.part_2d with method self._get_part_2d
+        # set self.part_2d with method
+        self._get_part_2d()
         # set self.fasteners with method self._get_fasteners
         # set self.junctions with method self._get_junctions
 
-    def get_parts_2d(self):
+    def _get_part_2d(self):
         """
         Get 2D parts of a finite element model
         """
@@ -57,56 +59,107 @@ class Bulk(BDF):
         # selected nids to search for attached elements
         _selected_nids = []
 
+        # search for part 2d
+        self._search_for_part_2d(_bulk_nids, _attached_eids, _selected_nids)
+
+        print(type(self.part_2d))
+        print(len(self.part_2d))
+
+    def _search_for_part_2d(self, bulk_nids, attached_eids, selected_nids):
+        """
+        Search for part 2d
+        :param self:
+        :param bulk_nids:
+        :param attached_eids:
+        :param selected_nids:
+        """
+        # create a dict map with nodes and their attached elements
+        nid_to_eids_map = self.get_node_id_to_element_ids_map()
+        # entire model elements
+        elements = self.elements
+        # part id
+        pid = 0
         # while bulk_nids is not empty, search for attached elements
-        while _bulk_nids:
-            _selected_nids = _set_selected_nids()
-            _bulk_nids = _remove_selected_nids_from_bulk_nids(self)
-            _attached_nids = _get_attached_eid_from_nid(self)
+        save = []
+        while bulk_nids:
+            selected_nids = _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements)
+            bulk_nids = _remove_selected_nids_from_bulk_nids(bulk_nids, selected_nids)
+            length = len(attached_eids)
+            save.extend(attached_eids)
+            attached_eids = []
+            attached_eids = _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map)
+            if length == len(attached_eids):
+                pid += 1
+                # Part2D creation
+                cur_part = Part2D(pid)
+                # add attached element ids to part
+                cur_part.elements = save
+                # add current part to part_2d list
+                self.part_2d[pid] = cur_part.elements
+                selected_nids = []
 
 
-def _set_selected_nids(bulk_nids, selected_nids, attached_eids):
+def _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements):
     """
-    Select node ids from which search for attached element ids
+    Select node ids from which search for attached element id
+    :param bulk_nids:
+    :param selected_nids:
+    :param attached_eids:
+    :param elements:
+    :return:
     """
     # if selected_nids is empty
     if not selected_nids:
         selected_nids.append(bulk_nids[0])
     else:
-        [selected_nids.append(attached_eids[i].node_ids) for i in attached_eids]
+        selected_nids = []
+        for i in range(len(attached_eids)):
+            for j in range(len(elements[attached_eids[i]].node_ids)):
+                if elements[attached_eids[i]].node_ids[j] not in selected_nids:
+                    selected_nids.append(elements[attached_eids[i]].node_ids[j])
     return selected_nids
-
-
-def _get_attached_eid_from_nid(selected_nids, attached_eids):
-    """
-    Get attached element ids from a node ids list
-    """
-    temp = get_eids_from_nid(selected_nids)
-    for i in range(len(temp)):
-        if temp[i] in attached_eids:
-            # ignore
-            continue
-        else:
-            # put the element in attached_eids if not already in
-            attached_eids.append(temp[i])
-    return attached_eids
 
 
 def _remove_selected_nids_from_bulk_nids(bulk_nids, selected_nids):
     """
-    remove nodes in _selected_nids from _bulk_ids
+    Remove nodes in bulk_ids from selected_nids
+    :param bulk_nids:
+    :param selected_nids:
+    :return:
     """
-    for i in range(len(selected_nids)):
-        bulk_nids.remove(selected_nids[i])
+    set_bulk_nids = set(bulk_nids)
+    set_selected_nids = set(selected_nids)
+    bulk_nids = list(set_bulk_nids.difference(set_selected_nids))
     return bulk_nids
+
+
+def _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map):
+    """
+    Get attached element ids from a node ids list
+    :param selected_nids:
+    :param attached_eids:
+    :param nid_to_eids_map:
+    :return:
+    """
+    print(selected_nids)
+    for i in range(len(selected_nids)):  # note : improve code by replacing for loop by concatenate function
+        if nid_to_eids_map[selected_nids[i]] in attached_eids:
+            # ignore
+            continue
+        else:
+            # put the element in attached_eids if not already in
+            attached_eids.extend(nid_to_eids_map[selected_nids[i]])
+    return attached_eids
 
 
 class Part2D:
     """
     Part2d object
     """
-    def __init__(self):
+    def __init__(self, part_id):
         """
         Initialize Part2d object
+        :param part_id:
         """
-        self.id = None
+        self.part_id = part_id
         self.elements = {}

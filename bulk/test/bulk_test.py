@@ -14,15 +14,8 @@ def test_read_bulk(model_filename):
     bulk.read_bulk(model_filename)
     # print model stat
     print(bulk.get_bdf_stats())
+    bulk._get_part_2d()
 
-def test_get_parts_2d(model_filename):
-    """get_parts_2d test """
-    from bulk.bulk import Bulk
-
-    bulk = Bulk()
-    # get 2d parts from testing model
-    bulk.read_bulk(model_filename)
-    bulk.get_parts_2d()
 
 def main():
     """the interface for bulk_test"""
@@ -31,10 +24,9 @@ def main():
     bdf_filename = os.path.join(test_path, 'FEM-001.bdf')
 
     # read testing model
-    #test_read_bulk(bdf_filename)
+    test_read_bulk(bdf_filename)
 
-    # get 2d parts testing
-    test_get_parts_2d(bdf_filename)
 
 if __name__ == '__main__':
     main()
+
