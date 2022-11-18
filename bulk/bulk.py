@@ -62,9 +62,6 @@ class Bulk(BDF):
         # search for part 2d
         self._search_for_part_2d(_bulk_nids, _attached_eids, _selected_nids)
 
-        print(type(self.part_2d))
-        print(len(self.part_2d))
-
     def _search_for_part_2d(self, bulk_nids, attached_eids, selected_nids):
         """
         Search for part 2d
@@ -75,28 +72,31 @@ class Bulk(BDF):
         """
         # create a dict map with nodes and their attached elements
         nid_to_eids_map = self.get_node_id_to_element_ids_map()
+
         # entire model elements
         elements = self.elements
+
         # part id
         pid = 0
+
+        length_old = len(attached_eids)
+
         # while bulk_nids is not empty, search for attached elements
-        save = []
         while bulk_nids:
-            selected_nids = _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements)
-            bulk_nids = _remove_selected_nids_from_bulk_nids(bulk_nids, selected_nids)
-            length = len(attached_eids)
-            save.extend(attached_eids)
+            while length_old < len(attached_eids) or len(attached_eids) == 0:
+                selected_nids = _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements)
+                bulk_nids = _remove_selected_nids_from_bulk_nids(bulk_nids, selected_nids)
+                length_old = len(attached_eids)
+                attached_eids = _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map)
+            pid += 1
+            # Part2D creation
+            cur_part = Part2D(pid)
+            # add attached element ids to part
+            cur_part.elements = attached_eids
+            # add current part to part_2d list
+            self.part_2d[pid] = cur_part.elements
+            selected_nids = []
             attached_eids = []
-            attached_eids = _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map)
-            if length == len(attached_eids):
-                pid += 1
-                # Part2D creation
-                cur_part = Part2D(pid)
-                # add attached element ids to part
-                cur_part.elements = save
-                # add current part to part_2d list
-                self.part_2d[pid] = cur_part.elements
-                selected_nids = []
 
 
 def _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements):
@@ -141,14 +141,10 @@ def _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map):
     :param nid_to_eids_map:
     :return:
     """
-    print(selected_nids)
     for i in range(len(selected_nids)):  # note : improve code by replacing for loop by concatenate function
-        if nid_to_eids_map[selected_nids[i]] in attached_eids:
-            # ignore
-            continue
-        else:
-            # put the element in attached_eids if not already in
-            attached_eids.extend(nid_to_eids_map[selected_nids[i]])
+        for j in range(len(nid_to_eids_map[selected_nids[i]])):
+            if nid_to_eids_map[selected_nids[i]][j] not in attached_eids:
+                attached_eids.append(nid_to_eids_map[selected_nids[i]][j])
     return attached_eids
 
 
