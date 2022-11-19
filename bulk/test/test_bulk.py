@@ -13,8 +13,11 @@ def test_read_bulk(model_filename):
     # read testing model
     bulk.read_bulk(model_filename)
     # print model stat
-    print(bulk.get_bdf_stats())
+    # print(bulk.get_bdf_stats())
+    # get 2D parts
     bulk._get_part_2d()
+    # print test
+    print(bulk.part_2d[11].part_id)
 
 
 def main():
