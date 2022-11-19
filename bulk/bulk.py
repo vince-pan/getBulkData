@@ -41,7 +41,7 @@ class Bulk(BDF):
         """
         # read bdf file
         self.read_bdf(bulk_filename)
-        # set self.part_2d with method
+        # get 2D parts with self.part_2d method
         self._get_part_2d()
         # set self.fasteners with method self._get_fasteners
         # set self.junctions with method self._get_junctions
@@ -52,13 +52,10 @@ class Bulk(BDF):
         """
         # list of all node ids
         _bulk_nids = list(self.node_ids)
-
         # blank element ids list
         _attached_eids = []
-
         # selected nids to search for attached elements
         _selected_nids = []
-
         # search for part 2d
         self._search_for_part_2d(_bulk_nids, _attached_eids, _selected_nids)
 
@@ -72,12 +69,12 @@ class Bulk(BDF):
         """
         # create a dict map with nodes and their attached elements
         nid_to_eids_map = self.get_node_id_to_element_ids_map()
-
         # entire model elements
         elements = self.elements
-
-        # part id
-        pid = 0
+        #
+        attached_elements = []
+        # set first 2D part id
+        pid = 10
 
         length_old = len(attached_eids)
 
@@ -88,13 +85,12 @@ class Bulk(BDF):
                 bulk_nids = _remove_selected_nids_from_bulk_nids(bulk_nids, selected_nids)
                 length_old = len(attached_eids)
                 attached_eids = _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map)
+                attached_elements = _get_elements_from_eid(attached_eids, elements)
             pid += 1
-            # Part2D creation
-            cur_part = Part2D(pid)
-            # add attached element ids to part
-            cur_part.elements = attached_eids
+            # create instance of Part2D class
+            cur_part = Part2D(pid, attached_elements)
             # add current part to part_2d list
-            self.part_2d[pid] = cur_part.elements
+            self.part_2d[pid] = cur_part
             selected_nids = []
             attached_eids = []
 
@@ -148,14 +144,21 @@ def _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map):
     return attached_eids
 
 
+def _get_elements_from_eid(eids, elements):
+    elm_obj = []
+    for eid in eids:
+        elm_obj.append(elements[eid])
+    return elm_obj
+
+
 class Part2D:
     """
     Part2d object
     """
-    def __init__(self, part_id):
+    def __init__(self, part_id, elements):
         """
         Initialize Part2d object
         :param part_id:
         """
         self.part_id = part_id
-        self.elements = {}
+        self.elements = elements
