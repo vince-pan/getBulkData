@@ -145,10 +145,7 @@ def _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map):
 
 
 def _get_elements_from_eid(eids, elements):
-    elm_obj = []
-    for eid in eids:
-        elm_obj.append(elements[eid])
-    return elm_obj
+    return [elements[eid] for eid in eids]
 
 
 class Part2D:
