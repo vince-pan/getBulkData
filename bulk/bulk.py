@@ -74,25 +74,31 @@ class Bulk(BDF):
         #
         attached_elements = []
         # set first 2D part id
-        pid = 10
-
+        pid = 11
+        #
         length_old = len(attached_eids)
 
         # while bulk_nids is not empty, search for attached elements
         while bulk_nids:
             while length_old < len(attached_eids) or len(attached_eids) == 0:
                 selected_nids = _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements)
+                #
                 bulk_nids = _remove_selected_nids_from_bulk_nids(bulk_nids, selected_nids)
+                #
                 length_old = len(attached_eids)
+                #
                 attached_eids = _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map)
-                attached_elements = _get_elements_from_eid(attached_eids, elements)
-            pid += 1
+                # get dictionary of 2D elements objects corresponding to attached_eids
+                attached_elements = _get_2d_elm_dict_from_eids(attached_eids, elements)
             # create instance of Part2D class
             cur_part = Part2D(pid, attached_elements)
             # add current part to part_2d list
             self.part_2d[pid] = cur_part
+            # re-initialize selected_nids and attached_nids lists
             selected_nids = []
             attached_eids = []
+            # increment pid by 1
+            pid += 1
 
 
 def _set_selected_nids(bulk_nids, selected_nids, attached_eids, elements):
@@ -144,8 +150,26 @@ def _get_attached_eid_from_nid(selected_nids, attached_eids, nid_to_eids_map):
     return attached_eids
 
 
-def _get_elements_from_eid(eids, elements):
-    return [elements[eid] for eid in eids]
+def _get_2d_elm_dict_from_eids(target_eids, elements):
+    """
+    Get dictionary of 2D elements objects from a list of target element ids
+
+    Parameters
+    ----------
+    target_eids: list
+        list of elements id's
+    elements: dict {element_id_1: element_obj_1, ..., element_id_n: element_obj_n}
+        dictionary of all element's objects in the model
+
+    Return a dictionary of only 2D element objects corresponding to list of elements id's
+        {element_id_1: element_obj_1, ..., element_id_n: element_obj_n}
+    """
+    # define list of 2D element types
+    element_2d_type = ['CQUAD4', 'CTRIA3']
+    # return a dictionary of 2D elements according to eids list
+    # if element type is 2D element
+    return {key: value for key, value in elements.items()
+            if (key in target_eids and value.type in element_2d_type)}
 
 
 class Part2D:
@@ -155,7 +179,13 @@ class Part2D:
     def __init__(self, part_id, elements):
         """
         Initialize Part2d object
-        :param part_id:
+
+        Parameters
+        ----------
+        part_id: int
+            id number of part object
+        elements: dict {element_id_1: element_obj_1, ..., element_id_n: element_obj_n}
+            dictionary of all element's objects of the part object
         """
         self.part_id = part_id
         self.elements = elements
