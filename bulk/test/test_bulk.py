@@ -15,7 +15,7 @@ def test_read_bulk(model_filename):
     # print model stat
     # print(bulk.get_bdf_stats())
     # print test
-    print(bulk.part_2d[12].elements)
+    print(bulk.part_2d[16].elements)
 
 
 def main():
