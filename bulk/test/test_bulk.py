@@ -13,8 +13,9 @@ def test_read_bulk(model_filename):
     # read testing model
     bulk.read_bulk(model_filename)
     # print model stat
-    print(bulk.get_bdf_stats())
-    bulk._get_part_2d()
+    # print(bulk.get_bdf_stats())
+    # print test
+    print(bulk.part_2d[16].elements)
 
 
 def main():
@@ -29,4 +30,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
