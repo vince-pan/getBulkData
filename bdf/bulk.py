@@ -32,12 +32,12 @@ class Bulk(BDF):
 
     def read_bulk(self, bulk_filename):
         """
-        Read method for the bulk files
+        Read method for the bdf files
 
         Parameters
         ----------
         bulk_filename: str
-            the input bulk file
+            the input bdf file
         """
         # read bdf file
         self.read_bdf(bulk_filename)

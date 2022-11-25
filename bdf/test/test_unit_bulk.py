@@ -2,7 +2,7 @@
 from unittest import TestCase
 import os
 
-from bulk.bulk import Bulk
+from bdf.bulk import Bulk
 
 
 class TestBulk(TestCase):

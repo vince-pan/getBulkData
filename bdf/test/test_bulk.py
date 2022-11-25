@@ -2,7 +2,7 @@
 """the interface for bulk_test"""
 
 import os
-from bulk.bulk import Bulk
+from bdf.bulk import Bulk
 
 
 def test_read_bulk(model_filename):
@@ -12,7 +12,7 @@ def test_read_bulk(model_filename):
     # read testing model
     bulk.read_bulk(model_filename)
     # print model stat
-    # print(bulk.get_bdf_stats())
+    # print(bdf.get_bdf_stats())
     # print test
     print(bulk.part_2d[16].elements)
 
