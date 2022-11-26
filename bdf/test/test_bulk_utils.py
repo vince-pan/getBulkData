@@ -13,22 +13,17 @@ class TestExtendElements(unittest.TestCase):
         self.bulk = Bulk()
         self.bulk.read_bulk(bdf_filename)
 
-        self.selected_nids = [177]
-
-        self.part_no_limit = extend_2d_elements_from_nids(self.bulk, self.selected_nids)
-        self.part_2_iter = extend_2d_elements_from_nids(self.bulk, self.selected_nids, 2)
+        self.selected_nids = [562]
+        self.part = extend_2d_elements_from_nids(self.bulk, self.selected_nids)
 
     def test_is_output_dictionary(self):
-        self.assertIsInstance(self.part_no_limit, dict)
+        self.assertIsInstance(self.part, dict)
 
     def test_number_of_elements(self):
-        self.assertEqual(len(self.part_no_limit), 150)
+        self.assertEqual(len(self.part), 75)
 
     def test_elements_types(self):
-        elm_types = list(set([elm_obj.type for elm_obj in self.part_no_limit.values()]))
+        elm_types = list(set([elm_obj.type for elm_obj in self.part.values()]))
         for elm_type in elm_types:
             with self.subTest(elm_type=elm_type):
                 self.assertIn(elm_type, ['CQUAD4', 'CTRIA3'])
-
-    def test_output_with_3_iterations(self):
-        self.assertEqual(len(self.part_2_iter), 4)
