@@ -1,32 +1,35 @@
 # coding: utf-8
-"""the interface for bulk_test"""
-
+from unittest import TestCase
 import os
 
-
-def test_read_bulk(model_filename):
-    """read_bulk test """
-    from bulk.bulk import Bulk
-
-    # create instance of class Bulk
-    bulk = Bulk()
-    # read testing model
-    bulk.read_bulk(model_filename)
-    # print model stat
-    # print(bulk.get_bdf_stats())
-    # print test
-    print(bulk.part_2d[16].elements)
+from bulk.bulk import Bulk
 
 
-def main():
-    """the interface for bulk_test"""
-    # set file name of testing model
-    test_path = os.path.join('..', '..', 'models')
-    bdf_filename = os.path.join(test_path, 'FEM-001.bdf')
-
-    # read testing model
-    test_read_bulk(bdf_filename)
+class TestBulk(TestCase):
+    def setUp(self):
+        test_path = os.path.join('..', '..', 'models')
+        bdf_filename = os.path.join(test_path, 'FEM-001.bdf')
+        self.bulk = Bulk()
+        self.bulk.read_bulk(bdf_filename)
 
 
-if __name__ == '__main__':
-    main()
+class TestGetPart2D(TestBulk):
+    def test_2d_parts_number(self):
+        self.assertEqual(len(self.bulk.part_2d), 6)
+
+    def test_nb_of_elements_in_parts(self):
+        elm_nb = {key: len(value.elements) for key, value in self.bulk.part_2d.items()}
+        self.assertEqual(elm_nb, {11: 150, 12: 150, 13: 50, 14: 50, 15: 75, 16: 75})
+
+    def test_2d_parts_element_id(self):
+        # check_dict = {part_id: element_id}
+        check_dict = {11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16}
+        for key, part_2d_obj in self.bulk.part_2d.items():
+            for k in part_2d_obj.elements.keys():
+                self.assertEqual(str(check_dict[key]), str(k)[:2])
+
+    def test_elements_types(self):
+        elm_types = list(set([elm.type for part in self.bulk.part_2d.values() for elm in part.elements.values()]))
+        for elm_type in elm_types:
+            with self.subTest(elm_type=elm_type):
+                self.assertIn(elm_type, ['CQUAD4', 'CTRIA3'])
