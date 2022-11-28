@@ -62,10 +62,10 @@ class Bulk(BDF):
             elements_2d = extend_2d_elements_from_nids(self, selected_nids)
             # store instance of Part2D
             if elements_2d:
-                part_2d = Part2D(part_id, elements_2d)
+                part_2d = Part2D(part_id, elements_2d, self)
                 self.part_2d[part_id] = part_2d
                 # add ids of 2D parts nodes to selected_nids
-                selected_nids = selected_nids + part_2d.nodes
+                selected_nids = selected_nids + list(part_2d.nodes)
             # update bulk_nids
             bulk_nids = [nid for nid in bulk_nids if nid not in selected_nids]
             # increment part_id by 1
@@ -76,7 +76,7 @@ class Part2D:
     """
     Part2d object
     """
-    def __init__(self, part_id, elements):
+    def __init__(self, part_id, elements, bulk):
         """
         Initialize Part2d object
 
@@ -89,12 +89,14 @@ class Part2D:
         """
         self.part_id = part_id
         self.elements = elements
+        self.bulk = bulk
         self.nodes = self._get_nodes()
 
     def _get_nodes(self):
         """
         """
-        return list(set([nid for elm in self.elements.values() for nid in elm.nodes]))
+        nids = list(set([nid for elm in self.elements.values() for nid in elm.nodes]))
+        return {nid: self.bulk.nodes[nid] for nid in self.bulk.nodes.keys() if nid in nids}
 
 
 def extend_2d_elements_from_nids(bulk, selected_nids):
