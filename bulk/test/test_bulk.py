@@ -33,3 +33,17 @@ class TestGetPart2D(TestBulk):
         for elm_type in elm_types:
             with self.subTest(elm_type=elm_type):
                 self.assertIn(elm_type, ['CQUAD4', 'CTRIA3'])
+
+
+class TestReadBulk(TestCase):
+    def test_read_model_only(self):
+        test_path = os.path.join('..', '..', 'models', 'FEM-001')
+        bdf_filename = os.path.join(test_path, 'FEM-001-model-only.bdf')
+        self.bulk = Bulk()
+        self.bulk.read_bulk(bdf_filename)
+
+    def test_read_run_include(self):
+        test_path = os.path.join('..', '..', 'models', 'FEM-001')
+        bdf_filename = os.path.join(test_path, 'FEM-001-run-include.dat')
+        self.bulk = Bulk()
+        self.bulk.read_bulk(bdf_filename)

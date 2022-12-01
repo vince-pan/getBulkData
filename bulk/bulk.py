@@ -40,7 +40,13 @@ class Bulk(BDF):
             the input bulk file
         """
         # read bulk file
-        self.read_bdf(bulk_filename)
+        try:
+            # reading a full-run model
+            self.read_bdf(bulk_filename)
+        except RuntimeError:
+            # reading a model-only model
+            self.read_bdf(bulk_filename, punch=True)
+
         # get 2D parts with self.part_2d method
         self._get_part_2d()
         # set self.fasteners with method self._get_fasteners
