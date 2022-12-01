@@ -7,8 +7,8 @@ from bulk.bulk import Bulk
 
 class TestBulk(TestCase):
     def setUp(self):
-        test_path = os.path.join('..', '..', 'models')
-        bdf_filename = os.path.join(test_path, 'FEM-001.bdf')
+        test_path = os.path.join('..', '..', 'models', 'FEM-001')
+        bdf_filename = os.path.join(test_path, 'FEM-001-full-run.bdf')
         self.bulk = Bulk()
         self.bulk.read_bulk(bdf_filename)
 

@@ -1,0 +1,18 @@
+SOL 101
+CEND
+$ Direct Text Input for Global Case Control Data
+TITLE = MSC.Nastran job created on 18-Oct-22 at 16:54:19
+ECHO = NONE
+SUBCASE 1
+   SUBTITLE=Default
+   DISPLACEMENT(SORT1,REAL)=ALL
+   SPCFORCES(SORT1,REAL)=ALL
+   STRESS(SORT1,REAL,VONMISES,BILIN)=ALL
+$ Direct Text Input for this Subcase
+BEGIN BULK
+$ Direct Text Input for Bulk Data
+PARAM   PRTMAXIM YES
+$
+include'FEM-001-model-only.bdf'
+$
+ENDDATA
