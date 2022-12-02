@@ -43,7 +43,6 @@ class Bulk(BDF):
         try:
             # reading a full-run model
             self.read_bdf(bulk_filename)
-
         except RuntimeError:
             try:
                 # reading a model-only model
