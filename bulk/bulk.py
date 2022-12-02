@@ -43,9 +43,17 @@ class Bulk(BDF):
         try:
             # reading a full-run model
             self.read_bdf(bulk_filename)
+
         except RuntimeError:
-            # reading a model-only model
-            self.read_bdf(bulk_filename, punch=True)
+            try:
+                # reading a model-only model
+                self.read_bdf(bulk_filename, punch=True)
+            except RuntimeError:
+                # no fea model
+                print('Trying to read an non FEA model')
+        except IOError as io_err:
+            # bad model include in run file
+            print(f'include error: {io_err.args[0]}')
 
         # get 2D parts with self.part_2d method
         self._get_part_2d()

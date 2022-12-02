@@ -47,3 +47,15 @@ class TestReadBulk(TestCase):
         bdf_filename = os.path.join(test_path, 'FEM-001-run-include.dat')
         self.bulk = Bulk()
         self.bulk.read_bulk(bdf_filename)
+
+    def test_read_run_bad_include(self):
+        test_path = os.path.join('..', '..', 'models', 'FEM-001')
+        bdf_filename = os.path.join(test_path, 'FEM-001-run-bad-include.dat')
+        self.bulk = Bulk()
+        self.bulk.read_bulk(bdf_filename)
+
+    def test_read_no_fea_model(self):
+        test_path = os.path.join('..', '..', 'models', 'dummy')
+        bdf_filename = os.path.join(test_path, 'non-model-file.txt')
+        self.bulk = Bulk()
+        self.bulk.read_bulk(bdf_filename)
