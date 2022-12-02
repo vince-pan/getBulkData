@@ -9,8 +9,8 @@ from bulk.bulk import Part2D
 class TestPart2D(TestCase):
     def setUp(self):
         # define test model
-        test_path = os.path.join('..', '..', 'models')
-        bdf_filename = os.path.join(test_path, 'FEM-001.bdf')
+        test_path = os.path.join('..', '..', 'models', 'FEM-001')
+        bdf_filename = os.path.join(test_path, 'FEM-001-full-run.bdf')
         # create instance of BDF
         self.model = BDF()
         self.model.read_bdf(bdf_filename)
