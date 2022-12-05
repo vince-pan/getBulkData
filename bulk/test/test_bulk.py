@@ -7,8 +7,8 @@ from bulk.bulk import Bulk
 
 class TestBulk(TestCase):
     def setUp(self):
-        test_path = os.path.join('..', '..', 'models', 'FEM-001')
-        bdf_filename = os.path.join(test_path, 'FEM-001-full-run.bdf')
+        test_path = os.path.join('..', '..', 'models', 'FEM-002')
+        bdf_filename = os.path.join(test_path, 'FEM-002.bdf')
         self.bulk = Bulk()
         self.bulk.read_bulk(bdf_filename)
 
@@ -59,3 +59,7 @@ class TestReadBulk(TestCase):
         bdf_filename = os.path.join(test_path, 'non-model-file.txt')
         self.bulk = Bulk()
         self.bulk.read_bulk(bdf_filename)
+
+class TestGetFasteners(TestBulk):
+    def test_fastener_number(self):
+        self.assertEqual(len(self.bulk.fasteners), 6)
