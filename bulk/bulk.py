@@ -23,6 +23,9 @@ class Bulk(BDF):
         # Initialize BDF class
         super().__init__()
 
+        # initialize read statement
+        self.read_statement = ""
+
         # store 2D parts
         self.part_2d = {}
         # store fasteners
@@ -43,14 +46,24 @@ class Bulk(BDF):
         try:
             # reading a full-run model
             self.read_bdf(bulk_filename)
+            self.read_statement = "full-run"
         except RuntimeError:
-            # reading a model-only model
-            self.read_bdf(bulk_filename, punch=True)
+            try:
+                # reading a model-only model
+                self.read_bdf(bulk_filename, punch=True)
+                self.read_statement = "model-only"
+            except RuntimeError:
+                # non FEA model
+                print('FATAL ERROR: Trying to read an non FEA model')
+        except IOError as io_err:
+            # bad model include in run file
+            print(f'FATAL ERROR: {io_err.args[0]}')
 
-        # get 2D parts with self.part_2d method
-        self._get_part_2d()
-        # set self.fasteners with method self._get_fasteners
-        # set self.junctions with method self._get_junctions
+        if self.read_statement:
+            # get 2D parts with self.part_2d method
+            self._get_part_2d()
+            # set self.fasteners with method self._get_fasteners
+            # set self.junctions with method self._get_junctions
 
     def _get_part_2d(self):
         """
