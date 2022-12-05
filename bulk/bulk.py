@@ -63,6 +63,7 @@ class Bulk(BDF):
             # get 2D parts with self.part_2d method
             self._get_part_2d()
             # set self.fasteners with method self._get_fasteners
+            self._get_fastener()
             # set self.junctions with method self._get_junctions
 
     def _get_part_2d(self):
@@ -89,6 +90,12 @@ class Bulk(BDF):
             bulk_nids = [nid for nid in bulk_nids if nid not in selected_nids]
             # increment part_id by 1
             part_id += 1
+
+    def _get_fastener(self):
+        """
+         Get fastener of a finite element model
+        """
+        self.fasteners = {rgd_element.eid: Fastener(rgd_element) for rgd_element in self.rigid_elements.values()}
 
 
 class Part2D:
@@ -135,3 +142,26 @@ def extend_2d_elements_from_nids(bulk, selected_nids):
         extended_eids = extend_2d_elements_from_nids(bulk, extended_nids)
     # return only 2D elements
     return {eid: bulk.elements[eid] for eid in list(set(extended_eids))}
+
+
+class Fastener:
+    """
+    Fastener object
+    """
+    def __init__(self, fastener):
+        """
+        Initialize Fastener object
+        :param fastener: rigid element object
+        """
+        # Fastener id
+        self.fastener_id = fastener.eid
+        # Fastener type (only RBE2 yet)
+        self.fastener_type = fastener.type
+        # RBE2 slave node (only 1 slave node is read yet, in the future a list of all slave nodes will be read)
+        self.dependent_node = fastener.Gmi_ref[0]
+        # RBE2 master node
+        self.independent_node = fastener.gn_ref
+        # DDLs bloqués
+        self.constraint_dof = fastener.cm
+
+
