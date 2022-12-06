@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Main Bulk class.  Defines:
   - Bulk
@@ -63,6 +62,7 @@ class Bulk(BDF):
             # get 2D parts with self.part_2d method
             self._get_part_2d()
             # set self.fasteners with method self._get_fasteners
+            self._get_fasteners()
             # set self.junctions with method self._get_junctions
 
     def _get_part_2d(self):
@@ -90,6 +90,12 @@ class Bulk(BDF):
             # increment part_id by 1
             part_id += 1
 
+    def _get_fasteners(self):
+        """
+         Get all fasteners of a finite element model
+        """
+        self.fasteners = {rgd_element.eid: Fastener(rgd_element) for rgd_element in self.rigid_elements.values()}
+
 
 class Part2D:
     """
@@ -116,6 +122,26 @@ class Part2D:
         """
         nids = list(set([nid for elm in self.elements.values() for nid in elm.nodes]))
         return {nid: self.bulk.nodes[nid] for nid in self.bulk.nodes.keys() if nid in nids}
+
+
+class Fastener:
+    """
+    Fastener object
+    """
+    def __init__(self, fastener):
+        """
+        Initialize Fastener object
+        :param fastener: rigid element object
+        """
+        # fastener id
+        self.fastener_id = fastener.eid
+        # fastener type
+        self.fastener_type = fastener.type
+        # fastener local coordinate system
+        self.coord = self._get_fastener_coord()
+
+    def _get_fastener_coord(self):
+        pass
 
 
 def extend_2d_elements_from_nids(bulk, selected_nids):
