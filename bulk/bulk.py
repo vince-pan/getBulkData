@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Main Bulk class.  Defines:
   - Bulk
@@ -138,6 +137,11 @@ class Fastener:
         self.fastener_id = fastener.eid
         # fastener type
         self.fastener_type = fastener.type
+        # fastener local coordinate system
+        self.coord = self._get_fastener_coord()
+
+    def _get_fastener_coord(self):
+        pass
 
 
 def extend_2d_elements_from_nids(bulk, selected_nids):
