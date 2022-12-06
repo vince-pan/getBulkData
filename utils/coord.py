@@ -14,7 +14,7 @@ class Coord:
         # local coordinate system vectors defined in global coordinate system
         self.x_vector = Vector(origin_point, xz_plane_point)
         self.z_vector = Vector(origin_point, z_axis_point)
-        self.y_vector = self._get_coord_y_vector()
+        self.y_vector = self._get_coord_y_vector(origin_point)
 
         # local coordinate system matrix defined in global coordinate system
         self.matrix = np.array([[self.x_vector.x, self.y_vector.x, self.z_vector.x],
@@ -24,7 +24,7 @@ class Coord:
         # calculate transformation matrix
         self.transformation_matrix = np.dot(np.eye(3), np.linalg.inv(self.matrix))
 
-    def _get_coord_y_vector(self):
+    def _get_coord_y_vector(self, origin_point):
         """
 
         Returns
@@ -34,7 +34,7 @@ class Coord:
         vector_y = np.cross([self.x_vector.x, self.x_vector.y, self.x_vector.z],
                             [self.z_vector.x, self.z_vector.y, self.z_vector.z])
 
-        return Vector(Point(0, 0, 0), Point(vector_y[0], vector_y[1], vector_y[2]))
+        return Vector(origin_point, Point(vector_y[0], vector_y[1], vector_y[2]))
 
 
 class Vector:
