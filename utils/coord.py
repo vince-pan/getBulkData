@@ -1,56 +1,61 @@
 # coding: utf-8
 """
-
+Main Coord class
 """
 import numpy as np
 
 
 class Coord:
     """
+    Coord object, coordinate system defined by three points
     """
     def __init__(self, origin_point, z_axis_point, xz_plane_point):
         """
+        Initialize the Coord object
+
+        Parameters
+        ----------
+        origin_point: ndarray
+            origin point coordinates in global coordinate system
+        z_axis_point: ndarray
+            z-axis point coordinates in global coordinate system
+        xz_plane_point: ndarray
+            xz-plane point coordinates in global coordinate system
         """
         # local coordinate system vectors defined in global coordinate system
-        self.x_vector = Vector(origin_point, xz_plane_point)
-        self.z_vector = Vector(origin_point, z_axis_point)
-        self.y_vector = self._get_coord_y_vector(origin_point)
+        self.z_axis = Vector(origin_point, z_axis_point).normalize()
+        self.x_axis = Vector(origin_point, xz_plane_point).normalize()
+        self.y_axis = np.cross(self.z_axis, self.x_axis)
 
         # local coordinate system matrix defined in global coordinate system
-        self.matrix = np.array([[self.x_vector.x, self.y_vector.x, self.z_vector.x],
-                               [self.x_vector.y, self.y_vector.y, self.z_vector.y],
-                               [self.x_vector.z, self.y_vector.z, self.z_vector.z]])
+        self.matrix = np.array([self.x_axis, self.y_axis, self.z_axis]).transpose()
 
-        # calculate transformation matrix
-        self.transformation_matrix = np.dot(np.eye(3), np.linalg.inv(self.matrix))
-
-    def _get_coord_y_vector(self, origin_point):
-        """
-
-        Returns
-        -------
-
-        """
-        vector_y = np.cross([self.x_vector.x, self.x_vector.y, self.x_vector.z],
-                            [self.z_vector.x, self.z_vector.y, self.z_vector.z])
-
-        return Vector(origin_point, Point(vector_y[0], vector_y[1], vector_y[2]))
+        # calculate rotation matrix
+        self.rotation_matrix = np.dot(np.eye(3), np.linalg.inv(self.matrix))
 
 
 class Vector:
     """
+    Vector object defined by two points
     """
     def __init__(self, point1, point2):
-        self.x = point2.x - point1.x
-        self.y = point2.y - point1.y
-        self.z = point2.z - point1.z
-        self.magnitude = np.sqrt(self.x**2 + self.y**2 + self.z**2)
+        """
+        Initialize the Vector object
 
+        Parameters
+        ----------
+        point1: ndarray
+            first vector point coordinates in global coordinate system
+        point2: ndarray
+            second vector point coordinates in global coordinate system
+        """
+        # vector coordinates in global coordinate system
+        self.coord = point2 - point1
+        # vector magnitude
+        self.magnitude = np.linalg.norm(self.coord)
 
-class Point:
-    """
-    """
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
+    def normalize(self):
+        """
+        Return coordinates of normalized vector (x, y, z): ndarray
+        """
+        return self.coord / self.magnitude
