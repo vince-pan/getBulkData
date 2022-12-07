@@ -6,7 +6,10 @@ Main Bulk class.  Defines:
   - Junction
 """
 
+import numpy as np
+
 from pyNastran.bdf.bdf import BDF
+from utils.coord import Coord, Point
 
 
 class Bulk(BDF):
@@ -94,7 +97,7 @@ class Bulk(BDF):
         """
          Get all fasteners of a finite element model
         """
-        self.fasteners = {rgd_element.eid: Fastener(rgd_element) for rgd_element in self.rigid_elements.values()}
+        self.fasteners = {rgd_element.eid: Fastener(rgd_element) for rgd_element in self.rigid_elements.values() if len(rgd_element.Gmi_ref) == 1}
 
 
 class Part2D:
@@ -133,6 +136,7 @@ class Fastener:
         Initialize Fastener object
         :param fastener: rigid element object
         """
+        self.fastener = fastener
         # fastener id
         self.fastener_id = fastener.eid
         # fastener type
@@ -141,7 +145,39 @@ class Fastener:
         self.coord = self._get_fastener_coord()
 
     def _get_fastener_coord(self):
-        pass
+        """
+        """
+        # master node
+        origin_point = Point(self.fastener.gn_ref.xyz[0],
+                             self.fastener.gn_ref.xyz[1],
+                             self.fastener.gn_ref.xyz[2])
+        # slave node
+        z_axis_point = Point(self.fastener.Gmi_ref[0].xyz[0],
+                             self.fastener.Gmi_ref[0].xyz[1],
+                             self.fastener.Gmi_ref[0].xyz[2])
+
+        # xz plane point calculated by z axis vector 90° rotation
+        xz_plane_point = self._compute_xz_plane_point()
+        # fastener coordinate system define by 3 points : oirign, z point and xz plane point
+        return Coord(origin_point, z_axis_point, xz_plane_point)
+
+    def _compute_xz_plane_point(self):
+        """
+        """
+        # 90 degrees z local axis vector rotation around y global axis
+        x_axis = np.dot(np.array([[0, 0, 1],
+                                          [0, 1, 0],
+                                          [-1, 0, 0]]),
+                                np.array([[self.fastener.Gmi_ref[0].xyz[0] - self.fastener.gn_ref.xyz[0]],
+                                          [self.fastener.Gmi_ref[0].xyz[1] - self.fastener.gn_ref.xyz[1]],
+                                          [self.fastener.Gmi_ref[0].xyz[2] - self.fastener.gn_ref.xyz[2]]])).flatten()
+        # compute xz_plane_point in this way :
+        # X_B = X_vector + X_A
+        # Y_B = Y_vector + Y_A
+        # Z_B = Z_vector + Z_A
+        return Point(x_axis[0] + self.fastener.gn_ref.xyz[0],
+                     x_axis[1] + self.fastener.gn_ref.xyz[1],
+                     x_axis[2] + self.fastener.gn_ref.xyz[2])
 
 
 def extend_2d_elements_from_nids(bulk, selected_nids):
