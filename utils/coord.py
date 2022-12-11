@@ -30,10 +30,8 @@ class Coord:
         -------
 
         """
-        vector_y = np.cross([self.z_vector[0], self.z_vector[1], self.z_vector[2]],
-                            [self.x_vector[0], self.x_vector[1], self.x_vector[2]])
-
-        return Vector(origin_point, Point(vector_y[0], vector_y[1], vector_y[0])).normalize()
+        return np.cross([self.z_vector[0], self.z_vector[1], self.z_vector[2]],
+                        [self.x_vector[0], self.x_vector[1], self.x_vector[2]])
 
 
 class Vector:
@@ -49,13 +47,7 @@ class Vector:
                        "y": point2.y - point1.y,
                        "z": point2.z - point1.z, }
         # compute vector magnitude
-        self.magnitude = self.magnitude(np.array(list(self.coords.values())))
-
-    def magnitude(self, vector):
-        """
-        Compute vector magnitude
-        """
-        return np.linalg.norm(vector)
+        self.magnitude = np.linalg.norm(list(self.coords.values()))
 
     def normalize(self):
         """

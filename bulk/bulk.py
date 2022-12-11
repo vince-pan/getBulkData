@@ -97,7 +97,9 @@ class Bulk(BDF):
         """
          Get all fasteners of a finite element model
         """
-        self.fasteners = {rgd_element.eid: Fastener(rgd_element) for rgd_element in self.rigid_elements.values() if len(rgd_element.Gmi_ref) == 1}
+        self.fasteners = {rgd_element.eid: Fastener(rgd_element)
+                          for rgd_element in self.rigid_elements.values()
+                          if len(rgd_element.Gmi_ref) == 1}
 
 
 class Part2D:
@@ -166,11 +168,11 @@ class Fastener:
         """
         # 90 degrees z local axis vector rotation around y global axis
         x_axis = np.dot(np.array([[0, 0, 1],
-                                          [0, 1, 0],
-                                          [-1, 0, 0]]),
-                                np.array([[self.fastener.Gmi_ref[0].xyz[0] - self.fastener.gn_ref.xyz[0]],
-                                          [self.fastener.Gmi_ref[0].xyz[1] - self.fastener.gn_ref.xyz[1]],
-                                          [self.fastener.Gmi_ref[0].xyz[2] - self.fastener.gn_ref.xyz[2]]])).flatten()
+                                  [0, 1, 0],
+                                  [-1, 0, 0]]),
+                        np.array([[self.fastener.Gmi_ref[0].xyz[0] - self.fastener.gn_ref.xyz[0]],
+                                  [self.fastener.Gmi_ref[0].xyz[1] - self.fastener.gn_ref.xyz[1]],
+                                  [self.fastener.Gmi_ref[0].xyz[2] - self.fastener.gn_ref.xyz[2]]])).flatten()
         # compute xz_plane_point in this way :
         # X_B = X_vector + X_A
         # Y_B = Y_vector + Y_A
