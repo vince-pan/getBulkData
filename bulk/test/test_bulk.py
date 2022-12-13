@@ -1,6 +1,7 @@
 # coding: utf-8
 from unittest import TestCase
 import os
+import numpy as np
 
 from bulk.bulk import Bulk
 
@@ -59,3 +60,26 @@ class TestReadBulk(TestCase):
         bdf_filename = os.path.join(test_path, 'non-model-file.txt')
         self.bulk = Bulk()
         self.bulk.read_bulk(bdf_filename)
+
+
+class TestBulk2(TestCase):
+    def setUp(self):
+        test_path = os.path.join('..', '..', 'models', 'FEM-002')
+        bdf_filename = os.path.join(test_path, 'FEM-002.bdf')
+        self.bulk = Bulk()
+        self.bulk.read_bulk(bdf_filename)
+
+
+class TestGetFasteners(TestBulk2):
+    def test_fastener_number(self):
+        self.assertEqual(len(self.bulk.fasteners), 5)
+
+    def test_vector_normalization(self):
+        vectors = [fastener.coord.x_vector for fastener in self.bulk.fasteners.values()]
+        for vector in vectors:
+            self.assertEqual(np.linalg.norm(vector), 1.0)
+
+    def test_det_matrix(self):
+        matrices = [fastener.coord.transformation_matrix for fastener in self.bulk.fasteners.values()]
+        for matrix in matrices:
+            self.assertEqual(np.linalg.det(matrix), 1)
